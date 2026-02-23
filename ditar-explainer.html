@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiTAR Explained</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --kid-bg: #0f0e17;
+    --kid-accent1: #ff6b6b;
+    --kid-accent2: #ffd93d;
+    --kid-accent3: #6bcb77;
+    --kid-accent4: #4d96ff;
+    --kid-accent5: #c77dff;
+    --adult-bg: #0a0a12;
+    --adult-accent: #00d4ff;
+    --adult-secondary: #7b2fff;
+    --glow1: rgba(255,107,107,0.3);
+    --glow2: rgba(77,150,255,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--kid-bg);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 30% 40%, rgba(77,150,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(199,125,255,0.15) 0%, transparent 60%),
+                #0f0e17;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridFloat 20s linear infinite;
+  }
+
+  @keyframes gridFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(40px); }
+  }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--kid-accent2);
+    border: 1px solid rgba(255,217,61,0.4);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    animation: fadeInDown 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 1;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInDown 0.6s 0.1s ease both;
+    margin-bottom: 1rem;
+  }
+
+  .hero p {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: rgba(255,255,255,0.6);
+    max-width: 600px;
+    line-height: 1.7;
+    animation: fadeInDown 0.6s 0.2s ease both;
+    margin-bottom: 2.5rem;
+  }
+
+  .scroll-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.15em;
+    animation: bounce 2s infinite, fadeInDown 0.6s 0.4s ease both;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION WRAPPER ── */
+  section {
+    padding: 5rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--kid-accent2);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+
+  /* ── KID SECTION ── */
+  .kid-section {
+    background: linear-gradient(135deg, rgba(255,107,107,0.05), rgba(77,150,255,0.05));
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 32px;
+    padding: 3rem 2rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kid-section::before {
+    content: '👦🏽';
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    font-size: 2rem;
+    opacity: 0.5;
+  }
+
+  /* ── STEP CARDS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .step-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+  }
+
+  .step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .step-card .emoji {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .step-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-card p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .step-card.red { border-color: rgba(255,107,107,0.3); }
+  .step-card.red h3 { color: var(--kid-accent1); }
+  .step-card.blue { border-color: rgba(77,150,255,0.3); }
+  .step-card.blue h3 { color: var(--kid-accent4); }
+  .step-card.purple { border-color: rgba(199,125,255,0.3); }
+  .step-card.purple h3 { color: var(--kid-accent5); }
+  .step-card.green { border-color: rgba(107,203,119,0.3); }
+  .step-card.green h3 { color: var(--kid-accent3); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2.5rem 0;
+  }
+
+  .flow-node {
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    min-width: 120px;
+    transition: all 0.3s ease;
+  }
+
+  .flow-node:hover {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.05);
+  }
+
+  .flow-node .fn-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+  .flow-node.n1 { border-color: rgba(255,107,107,0.5); color: var(--kid-accent1); }
+  .flow-node.n2 { border-color: rgba(255,217,61,0.5); color: var(--kid-accent2); }
+  .flow-node.n3 { border-color: rgba(77,150,255,0.5); color: var(--kid-accent4); }
+  .flow-node.n4 { border-color: rgba(199,125,255,0.5); color: var(--kid-accent5); }
+  .flow-node.n5 { border-color: rgba(107,203,119,0.5); color: var(--kid-accent3); }
+
+  .flow-arrow {
+    font-size: 1.5rem;
+    color: rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+
+  /* ── ANALOGY BOX ── */
+  .analogy {
+    background: rgba(255,217,61,0.07);
+    border-left: 4px solid var(--kid-accent2);
+    border-radius: 0 16px 16px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+  }
+
+  .analogy strong { color: var(--kid-accent2); }
+
+  /* ── ADULT SECTION ── */
+  .adult-section {
+    background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(123,47,255,0.04));
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 32px;
+    padding: 3rem 2rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+    position: relative;
+  }
+
+  .adult-section::before {
+    content: '👨‍💻';
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    font-size: 2rem;
+    opacity: 0.5;
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .tech-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+  }
+
+  .tech-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,212,255,0.3);
+  }
+
+  .tech-card .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--adult-accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .tech-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #fff;
+  }
+
+  .tech-card p {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+  }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-diagram {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 24px;
+    padding: 2rem;
+    margin: 2rem 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    overflow-x: auto;
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.6rem 0;
+    flex-wrap: nowrap;
+  }
+
+  .arch-box {
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .arch-box.input { background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.4); color: #ff6b6b; }
+  .arch-box.encoder { background: rgba(255,217,61,0.12); border: 1px solid rgba(255,217,61,0.4); color: #ffd93d; }
+  .arch-box.lm { background: rgba(77,150,255,0.12); border: 1px solid rgba(77,150,255,0.4); color: #4d96ff; }
+  .arch-box.diff { background: rgba(199,125,255,0.12); border: 1px solid rgba(199,125,255,0.4); color: #c77dff; }
+  .arch-box.output { background: rgba(107,203,119,0.12); border: 1px solid rgba(107,203,119,0.4); color: #6bcb77; }
+  .arch-box.note { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-weight: 400; font-size: 0.7rem; }
+
+  .arch-arrow { color: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+  }
+
+  .compare-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.4);
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .compare-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.7);
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { font-weight: 600; color: #fff; }
+  .win { color: var(--kid-accent3) !important; }
+  .lose { color: var(--kid-accent1) !important; }
+
+  /* ── TEMPERATURE VIZ ── */
+  .temp-viz {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .temp-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .temp-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .temp-bar {
+    height: 10px;
+    border-radius: 100px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .temp-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.5s ease;
+  }
+
+  .temp-desc {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.4);
+    width: 130px;
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 80%;
+    max-width: 600px;
+    margin: 1rem auto 3rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  /* ── PILL ── */
+  .pill {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  .pill.kid { background: rgba(255,107,107,0.15); color: var(--kid-accent1); border: 1px solid rgba(255,107,107,0.3); }
+  .pill.adult { background: rgba(0,212,255,0.1); color: var(--adult-accent); border: 1px solid rgba(0,212,255,0.25); }
+
+  body p { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.7); }
+
+  .highlight {
+    background: linear-gradient(135deg, rgba(77,150,255,0.08), rgba(199,125,255,0.08));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.75);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">FROM BYTEDANCE · 2024</div>
+  <h1>DiTAR</h1>
+  <p>An AI that reads any text aloud — in <em>any</em> voice — and sounds completely human. Here's how it actually works.</p>
+  <div class="scroll-hint">▼ &nbsp; SCROLL DOWN &nbsp; ▼</div>
+</div>
+
+<!-- ═══ FOR A 10-YEAR-OLD ═══ -->
+<section>
+  <div class="kid-section">
+    <div class="pill kid">👦 FOR A 10-YEAR-OLD</div>
+    <h2 style="color: var(--kid-accent1);">Imagine you're a Magic Robot DJ 🎧</h2>
+    <p>DiTAR is like a robot that can copy anyone's voice and read out loud perfectly — even voices it's never heard before! Here's how it works step by step:</p>
+
+    <!-- Flow diagram -->
+    <div class="flow" style="margin-top:2rem;">
+      <div class="flow-node n1">
+        <span class="fn-emoji">📝</span>
+        Text in
+        <div style="font-size:0.7rem;opacity:0.6;font-weight:400;margin-top:0.2rem;">"Hello!"</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node n2">
+        <span class="fn-emoji">🎤</span>
+        Voice sample
+        <div style="font-size:0.7rem;opacity:0.6;font-weight:400;margin-top:0.2rem;">5 sec clip</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node n3">
+        <span class="fn-emoji">🧠</span>
+        Smart brain
+        <div style="font-size:0.7rem;opacity:0.6;font-weight:400;margin-top:0.2rem;">plans sound</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node n4">
+        <span class="fn-emoji">🎨</span>
+        Artist
+        <div style="font-size:0.7rem;opacity:0.6;font-weight:400;margin-top:0.2rem;">adds detail</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node n5">
+        <span class="fn-emoji">🔊</span>
+        Voice out!
+        <div style="font-size:0.7rem;opacity:0.6;font-weight:400;margin-top:0.2rem;">sounds real</div>
+      </div>
+    </div>
+
+    <!-- Step cards -->
+    <div class="steps">
+      <div class="step-card red">
+        <span class="emoji">📝</span>
+        <h3>Step 1: Give it words</h3>
+        <p>You type something like "Happy Birthday!" and also give it a 5-second clip of your grandma's voice.</p>
+      </div>
+      <div class="step-card blue">
+        <span class="emoji">🧩</span>
+        <h3>Step 2: Break it into chunks</h3>
+        <p>Instead of making sound one tiny piece at a time (super slow), it groups sounds together in little "bundles" — like packing blocks instead of grains of sand.</p>
+      </div>
+      <div class="step-card purple">
+        <span class="emoji">🧠</span>
+        <h3>Step 3: Smart brain plans it</h3>
+        <p>A clever AI brain (like the one in ChatGPT!) reads the bundles and thinks: "OK, what should the next sound bundle be? Should it go up or down? Fast or slow?"</p>
+      </div>
+      <div class="step-card green">
+        <span class="emoji">🎨</span>
+        <h3>Step 4: Artist fills in details</h3>
+        <p>A second AI (the "diffusion" part) takes the rough plan and polishes it — like an artist who starts with a pencil sketch and then paints it beautifully.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <strong>🍦 Real-world analogy:</strong> Imagine you want to make an ice cream cone that tastes exactly like your favorite shop. First, you write down the flavor (text). Then a chef looks at the recipe and plans the ingredients (language model). Finally, a master ice cream maker carefully scoops and decorates it (diffusion). The result? A perfect copy — even though the master never visited the shop!
+    </div>
+
+    <div class="analogy" style="border-left-color: var(--kid-accent4); background: rgba(77,150,255,0.07);">
+      <strong style="color:var(--kid-accent4);">🎮 Even simpler:</strong> Think of Minecraft. First you plan where to build (language model). Then you actually place the blocks carefully (diffusion model). DiTAR does the same thing — but with sound blocks instead of Minecraft blocks!
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ FOR A 25-YEAR-OLD ═══ -->
+<section>
+  <div class="adult-section">
+    <div class="pill adult">👨‍💻 FOR A 25-YEAR-OLD</div>
+    <h2 style="color: var(--adult-accent);">The Technical Picture</h2>
+    <p>DiTAR is a zero-shot TTS (text-to-speech) system that combines an autoregressive language model with a diffusion transformer decoder — without discretizing the audio into tokens first. Here's the architecture:</p>
+
+    <!-- Architecture diagram -->
+    <div class="arch-diagram">
+      <div style="color:rgba(255,255,255,0.25);font-size:0.7rem;margin-bottom:1rem;letter-spacing:0.1em;">── DITAR ARCHITECTURE ──</div>
+
+      <div class="arch-row">
+        <div class="arch-box input">TEXT + VOICE PROMPT</div>
+        <div class="arch-arrow">──→</div>
+        <div class="arch-box note">raw waveform / mel spectrogram</div>
+      </div>
+
+      <div class="arch-row" style="margin-left:2rem;">
+        <div style="color:rgba(255,255,255,0.15);font-size:1.2rem;">↓</div>
+      </div>
+
+      <div class="arch-row">
+        <div class="arch-box encoder">AGGREGATION ENCODER</div>
+        <div class="arch-arrow">──→</div>
+        <div class="arch-box note">groups N frames → 1 patch embedding (reduces seq length dramatically)</div>
+      </div>
+
+      <div class="arch-row" style="margin-left:2rem;">
+        <div style="color:rgba(255,255,255,0.15);font-size:1.2rem;">↓</div>
+      </div>
+
+      <div class="arch-row">
+        <div class="arch-box lm">CAUSAL LANGUAGE MODEL</div>
+        <div class="arch-arrow">──→</div>
+        <div class="arch-box note">attends over patch history → outputs context vector for next patch</div>
+      </div>
+
+      <div class="arch-row" style="margin-left:2rem;">
+        <div style="color:rgba(255,255,255,0.15);font-size:1.2rem;">↓</div>
+      </div>
+
+      <div class="arch-row">
+        <div class="arch-box diff">LOCDIT · DIFFUSION DECODER</div>
+        <div class="arch-arrow">──→</div>
+        <div class="arch-box note">reverse ODE: noise → clean patch. Temperature = noise timestep τ</div>
+      </div>
+
+      <div class="arch-row" style="margin-left:2rem;">
+        <div style="color:rgba(255,255,255,0.15);font-size:1.2rem;">↓</div>
+      </div>
+
+      <div class="arch-row">
+        <div class="arch-box output">WAVEFORM OUTPUT 🔊</div>
+        <div class="arch-arrow">──→</div>
+        <div class="arch-box note">SOTA on robustness, speaker similarity, naturalness</div>
+      </div>
+    </div>
+
+    <!-- Tech cards -->
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="tag">PROBLEM SOLVED</span>
+        <h4>Why not just use discrete tokens?</h4>
+        <p>Traditional TTS (like VALL-E) converts audio → discrete codes (e.g., EnCodec tokens) → waveform. This compression loses subtle voice nuances — timbre, breathiness, emotion. DiTAR skips the discretization entirely and works in continuous latent space, preserving fidelity.</p>
+      </div>
+      <div class="tech-card">
+        <span class="tag">KEY INNOVATION</span>
+        <h4>Patch-based divide & conquer</h4>
+        <p>Instead of predicting one frame at a time (O(N) diffusion calls), DiTAR predicts a patch of K frames per step. The LM handles long-range coherence; LocDiT handles local acoustic detail. This decoupling is why it's fast <em>and</em> high quality.</p>
+      </div>
+      <div class="tech-card">
+        <span class="tag">TEMPERATURE</span>
+        <h4>Noise as a creativity dial</h4>
+        <p>In standard diffusion, you start from pure noise at timestep T and denoise to 0. DiTAR defines temperature τ as the starting timestep — higher τ = more noise = more expressive/diverse output. Lower τ = more deterministic = accurate but possibly flat delivery.</p>
+      </div>
+      <div class="tech-card">
+        <span class="tag">SCALABILITY</span>
+        <h4>Scales like a proper LLM</h4>
+        <p>Most TTS systems hit a quality ceiling when you add parameters. DiTAR shows consistent improvement with scale — essentially a continuous-valued LLM. This is a big deal because it means future, bigger versions will naturally be better.</p>
+      </div>
+    </div>
+
+    <!-- Temperature visualization -->
+    <div class="temp-viz">
+      <div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:0.15em;margin-bottom:1rem;">── TEMPERATURE CONTROL ──</div>
+      
+      <div class="temp-bar-wrap">
+        <div class="temp-label">Low τ (0.1)</div>
+        <div class="temp-bar">
+          <div class="temp-bar-fill" style="width:15%;background:linear-gradient(90deg,#4d96ff,#6bcb77);"></div>
+        </div>
+        <div class="temp-desc">Precise, flat delivery</div>
+      </div>
+
+      <div class="temp-bar-wrap">
+        <div class="temp-label">Mid τ (0.5)</div>
+        <div class="temp-bar">
+          <div class="temp-bar-fill" style="width:50%;background:linear-gradient(90deg,#4d96ff,#ffd93d);"></div>
+        </div>
+        <div class="temp-desc">Natural conversation</div>
+      </div>
+
+      <div class="temp-bar-wrap">
+        <div class="temp-label">High τ (0.9)</div>
+        <div class="temp-bar">
+          <div class="temp-bar-fill" style="width:90%;background:linear-gradient(90deg,#ffd93d,#ff6b6b);"></div>
+        </div>
+        <div class="temp-desc">Expressive, emotional</div>
+      </div>
+
+      <div style="margin-top:1rem;font-size:0.8rem;color:rgba(255,255,255,0.4);line-height:1.6;">
+        Real-world equivalent: a news anchor reads at low τ. A stand-up comedian riffs at high τ.
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <p style="margin-bottom:1rem;"><strong style="color:#fff;">How DiTAR compares to other approaches:</strong></p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>SYSTEM</th>
+          <th>APPROACH</th>
+          <th>SPEED</th>
+          <th>QUALITY</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>VALL-E</td>
+          <td>Discrete tokens + AR</td>
+          <td class="win">Fast</td>
+          <td class="lose">Lossy compression</td>
+        </tr>
+        <tr>
+          <td>ARDiT</td>
+          <td>Diffusion across whole model</td>
+          <td class="lose">Slow</td>
+          <td class="win">High quality</td>
+        </tr>
+        <tr>
+          <td>MAR</td>
+          <td>Diffusion head (images)</td>
+          <td class="win">Fast</td>
+          <td>Medium</td>
+        </tr>
+        <tr>
+          <td style="color:var(--adult-accent);"><strong>DiTAR ✦</strong></td>
+          <td>Patch LM + local diffusion head</td>
+          <td class="win">Fast</td>
+          <td class="win">SOTA quality</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      💡 <strong style="color:#fff;">The big picture:</strong> DiTAR is essentially proving you don't need to convert audio into discrete "words" (tokens) for an AI to generate it autoregressively. Instead you can treat sound like a continuous signal — similar to how a musician thinks in flowing melody, not sheet music notation — and still get the best of both worlds: the coherence of a language model and the realism of a diffusion model.
+    </div>
+
+    <div class="analogy" style="border-left-color:var(--adult-accent);background:rgba(0,212,255,0.05);">
+      <strong style="color:var(--adult-accent);">📱 Real-world uses this will enable:</strong> Real-time AI dubbing in any language with your own voice, personalized audiobooks narrated in a loved one's voice from a 5-second clip, game NPCs that never repeat the same line twice, and assistants that match your vocal style instead of sounding robotic.
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  DITAR · BYTEDANCE SEED · EXPLAINED FOR HUMANS ·  CLAUDE
+</div>
+
+</body>
+</html>

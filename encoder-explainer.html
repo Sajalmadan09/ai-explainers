@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encoder vs Aggregation Encoder</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08090d;
+  --surface: #0e1018;
+  --surface2: #141720;
+  --enc-color: #f97316;
+  --agg-color: #22d3ee;
+  --neutral: #a3e635;
+  --text: #e8eaf0;
+  --muted: #5a5f72;
+  --border: rgba(255,255,255,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lora', Georgia, serif;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ── HEADER ── */
+header {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(249,115,22,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 50%, rgba(34,211,238,0.1) 0%, transparent 70%),
+    var(--bg);
+  position: relative;
+}
+
+header::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.vs-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:0.75rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.2em;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:100px;
+  padding:0.5rem 1.5rem;
+  margin-bottom:2rem;
+  position:relative;
+  z-index:1;
+}
+
+header h1 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:clamp(2.2rem,6vw,5.5rem);
+  line-height:1.05;
+  position:relative;
+  z-index:1;
+  margin-bottom:1.5rem;
+}
+
+.word-enc { color:var(--enc-color); }
+.word-agg { color:var(--agg-color); }
+
+header .subtitle {
+  font-size:clamp(0.95rem,2vw,1.2rem);
+  color:rgba(255,255,255,0.45);
+  max-width:560px;
+  margin:0 auto 3rem;
+  position:relative;
+  z-index:1;
+  font-style:italic;
+}
+
+.scroll-pill {
+  position:relative;
+  z-index:1;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  color:var(--muted);
+  animation:bob 2.5s ease-in-out infinite;
+}
+
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(10px)} }
+
+/* ── LAYOUT ── */
+.container {
+  max-width:1040px;
+  margin:0 auto;
+  padding:0 2rem;
+}
+
+/* ── SECTION HEADING ── */
+.sec-head {
+  text-align:center;
+  padding:5rem 2rem 2rem;
+}
+
+.sec-head .label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.25em;
+  color:var(--muted);
+  text-transform:uppercase;
+  display:block;
+  margin-bottom:0.75rem;
+}
+
+.sec-head h2 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:clamp(1.8rem,4vw,3rem);
+  line-height:1.1;
+  margin-bottom:1rem;
+}
+
+/* ── CONCEPT CARD ── */
+.concept-wrap {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  padding:0 2rem 4rem;
+  max-width:1040px;
+  margin:0 auto;
+}
+
+@media(max-width:700px){ .concept-wrap{grid-template-columns:1fr;} }
+
+.concept-card {
+  border-radius:24px;
+  padding:2rem;
+  border:1px solid var(--border);
+  background:var(--surface);
+  position:relative;
+  overflow:hidden;
+}
+
+.concept-card::before {
+  content:'';
+  position:absolute;
+  top:-40px;
+  right:-40px;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  opacity:0.08;
+}
+
+.concept-card.enc::before { background:var(--enc-color); }
+.concept-card.agg::before { background:var(--agg-color); }
+
+.concept-card .chip {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  padding:0.35rem 0.85rem;
+  border-radius:100px;
+  display:inline-block;
+  margin-bottom:1rem;
+  font-weight:600;
+}
+
+.concept-card.enc .chip { background:rgba(249,115,22,0.12); color:var(--enc-color); border:1px solid rgba(249,115,22,0.3); }
+.concept-card.agg .chip { background:rgba(34,211,238,0.1); color:var(--agg-color); border:1px solid rgba(34,211,238,0.25); }
+
+.concept-card h3 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:1.5rem;
+  margin-bottom:0.5rem;
+}
+
+.concept-card.enc h3 { color:var(--enc-color); }
+.concept-card.agg h3 { color:var(--agg-color); }
+
+.concept-card .tagline {
+  font-style:italic;
+  color:var(--muted);
+  font-size:0.88rem;
+  margin-bottom:1.25rem;
+}
+
+.concept-card p {
+  font-size:0.9rem;
+  color:rgba(255,255,255,0.65);
+  line-height:1.75;
+}
+
+/* ── VISUAL DEMO ── */
+.demo-section {
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:4rem 2rem;
+}
+
+.demo-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:3rem;
+  max-width:1000px;
+  margin:2.5rem auto 0;
+  align-items:start;
+}
+
+@media(max-width:700px){ .demo-grid{grid-template-columns:1fr;} }
+
+.demo-col h4 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:1.1rem;
+  margin-bottom:1.5rem;
+  display:flex;
+  align-items:center;
+  gap:0.6rem;
+}
+
+/* ── VISUAL BOXES ── */
+.frames {
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+}
+
+.frame {
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+}
+
+.frame-box {
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  font-weight:600;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.frame-arrow {
+  font-size:1.1rem;
+  color:var(--muted);
+}
+
+.output-box {
+  border-radius:12px;
+  padding:0.6rem 1rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.7rem;
+  font-weight:600;
+  flex:1;
+}
+
+/* Encoder colors - each frame individually processed */
+.enc-frame { background:rgba(249,115,22,0.1); color:var(--enc-color); border-color:rgba(249,115,22,0.25); }
+.enc-output { background:rgba(249,115,22,0.07); color:rgba(249,115,22,0.8); border:1px solid rgba(249,115,22,0.15); }
+
+/* Aggregation colors - groups merged */
+.agg-frame { background:rgba(34,211,238,0.08); color:var(--agg-color); border-color:rgba(34,211,238,0.2); }
+
+.group-bracket {
+  display:flex;
+  gap:0.4rem;
+  margin-bottom:0.5rem;
+}
+
+.group-box {
+  flex:1;
+  text-align:center;
+  border-radius:10px;
+  padding:0.5rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  background:rgba(34,211,238,0.08);
+  border:1px solid rgba(34,211,238,0.2);
+  color:var(--agg-color);
+  font-weight:600;
+}
+
+.merge-arrow {
+  text-align:center;
+  color:var(--muted);
+  font-size:1rem;
+  margin:0.4rem 0;
+}
+
+.patch-box {
+  border-radius:12px;
+  padding:0.6rem 1rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.72rem;
+  font-weight:700;
+  text-align:center;
+  background:rgba(34,211,238,0.1);
+  border:1px solid rgba(34,211,238,0.3);
+  color:var(--agg-color);
+  margin-bottom:1rem;
+}
+
+.note-box {
+  border-radius:12px;
+  padding:0.75rem 1rem;
+  font-size:0.82rem;
+  line-height:1.6;
+  border-left:3px solid;
+  background:rgba(255,255,255,0.03);
+  color:rgba(255,255,255,0.55);
+  margin-top:1.25rem;
+}
+
+.note-box.enc-note { border-color:var(--enc-color); }
+.note-box.agg-note { border-color:var(--agg-color); }
+
+/* ── ANALOGY SECTION ── */
+.analogy-section {
+  padding:5rem 2rem;
+  max-width:1040px;
+  margin:0 auto;
+}
+
+.analogy-row {
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:0 2rem;
+  align-items:start;
+  margin-bottom:2.5rem;
+  padding-bottom:2.5rem;
+  border-bottom:1px solid var(--border);
+}
+
+.analogy-row:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+
+.analogy-emoji {
+  font-size:3rem;
+  line-height:1;
+  padding-top:0.2rem;
+}
+
+.analogy-content h4 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:1.15rem;
+  margin-bottom:0.4rem;
+}
+
+.analogy-content p {
+  font-size:0.9rem;
+  color:rgba(255,255,255,0.55);
+  line-height:1.7;
+}
+
+.analogy-content p strong { color:var(--text); }
+
+.enc-label { color:var(--enc-color); }
+.agg-label { color:var(--agg-color); }
+
+/* ── COMPARISON TABLE ── */
+.table-section {
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:5rem 2rem;
+}
+
+.cmp-table {
+  width:100%;
+  max-width:900px;
+  margin:2rem auto 0;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:0.87rem;
+}
+
+.cmp-table thead tr {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+}
+
+.cmp-table th, .cmp-table td {
+  padding:1rem 1.25rem;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+
+.cmp-table th:first-child, .cmp-table td:first-child {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.4);
+  letter-spacing:0.05em;
+  width:180px;
+}
+
+.cmp-table td:nth-child(2) { color:var(--enc-color); }
+.cmp-table td:nth-child(3) { color:var(--agg-color); }
+
+.cmp-table tbody tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* ── WHEN TO USE ── */
+.when-section {
+  padding:5rem 2rem;
+  max-width:1040px;
+  margin:0 auto;
+}
+
+.when-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:2rem;
+}
+
+@media(max-width:700px){ .when-grid{grid-template-columns:1fr;} }
+
+.when-card {
+  border-radius:20px;
+  padding:1.75rem;
+  border:1px solid var(--border);
+}
+
+.when-card.enc-card { border-color:rgba(249,115,22,0.25); background:rgba(249,115,22,0.04); }
+.when-card.agg-card { border-color:rgba(34,211,238,0.2); background:rgba(34,211,238,0.03); }
+
+.when-card h4 {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:1.1rem;
+  margin-bottom:1rem;
+}
+
+.when-card.enc-card h4 { color:var(--enc-color); }
+.when-card.agg-card h4 { color:var(--agg-color); }
+
+.when-item {
+  display:flex;
+  gap:0.6rem;
+  margin-bottom:0.6rem;
+  font-size:0.87rem;
+  color:rgba(255,255,255,0.6);
+  line-height:1.5;
+}
+
+.when-item::before { content:'→'; flex-shrink:0; opacity:0.4; }
+
+/* ── KEY INSIGHT ── */
+.insight {
+  background:linear-gradient(135deg, rgba(163,230,53,0.06), rgba(163,230,53,0.02));
+  border:1px solid rgba(163,230,53,0.2);
+  border-radius:24px;
+  padding:2rem 2.5rem;
+  max-width:900px;
+  margin:0 auto 5rem;
+  text-align:center;
+}
+
+.insight .insight-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  color:var(--neutral);
+  margin-bottom:1rem;
+  display:block;
+}
+
+.insight p {
+  font-size:1.05rem;
+  line-height:1.8;
+  color:rgba(255,255,255,0.7);
+}
+
+.insight p strong { color:#fff; }
+
+footer {
+  text-align:center;
+  padding:2rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  color:var(--muted);
+  letter-spacing:0.15em;
+  border-top:1px solid var(--border);
+}
+
+/* ── ANIMATE ON LOAD ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+header > * { animation: fadeUp 0.7s ease both; }
+header .vs-badge { animation-delay:0s; }
+header h1 { animation-delay:0.1s; }
+header .subtitle { animation-delay:0.2s; }
+header .scroll-pill { animation-delay:0.3s; }
+
+/* frame bar animations */
+.frame-box { animation: fadeUp 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header>
+  <div class="vs-badge">DEEP DIVE · AI CONCEPTS</div>
+  <h1>
+    <span class="word-enc">Encoder</span><br>
+    <span style="color:var(--muted);font-size:0.5em;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;">vs</span><br>
+    <span class="word-agg">Aggregation Encoder</span>
+  </h1>
+  <p class="subtitle">Same family. Very different jobs. Let's break it down — from sandwich shops to neural networks.</p>
+  <div class="scroll-pill">↓ scroll to explore ↓</div>
+</header>
+
+<!-- ── CONCEPT CARDS ── -->
+<div class="sec-head">
+  <span class="label">THE BASICS</span>
+  <h2>What is each one, simply?</h2>
+</div>
+
+<div class="concept-wrap">
+  <div class="concept-card enc">
+    <span class="chip">REGULAR ENCODER</span>
+    <h3>The Translator</h3>
+    <div class="tagline">"Takes one thing, turns it into a number-code."</div>
+    <p>
+      An Encoder's job is to <strong>understand and compress</strong> something — text, audio, an image — into a dense numerical representation (called an "embedding" or "vector") that a machine can work with.<br><br>
+      It reads <em>every single piece</em> of input individually and produces a representation for each one. Like a translator who processes every word, one at a time.
+    </p>
+  </div>
+
+  <div class="concept-card agg">
+    <span class="chip">AGGREGATION ENCODER</span>
+    <h3>The Summarizer</h3>
+    <div class="tagline">"Groups many things, squeezes them into one code."</div>
+    <p>
+      An Aggregation Encoder does everything a regular encoder does — but it takes <strong>multiple items at once</strong> and merges/summarizes them into a single, compact representation called a <em>patch</em>.<br><br>
+      Instead of one code per item, you get one code for a <em>group</em> of items. Like a meeting summary instead of reading every email.
+    </p>
+  </div>
+</div>
+
+<!-- ── VISUAL DEMO ── -->
+<div class="demo-section">
+  <div style="text-align:center;">
+    <span class="label" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:0.75rem;">VISUAL BREAKDOWN</span>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);">How they process audio frames</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-top:0.5rem;font-style:italic;">Let's say audio has been split into 6 small frames (tiny slices of sound)</p>
+  </div>
+
+  <div class="demo-grid">
+    <!-- REGULAR ENCODER -->
+    <div class="demo-col">
+      <h4><span style="color:var(--enc-color);">●</span> Regular Encoder</h4>
+
+      <div class="frames">
+        <div class="frame" style="animation-delay:0.05s">
+          <div class="frame-box enc-frame">F1</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_1 [0.2, 0.7, ...]</div>
+        </div>
+        <div class="frame" style="animation-delay:0.1s">
+          <div class="frame-box enc-frame">F2</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_2 [0.5, 0.1, ...]</div>
+        </div>
+        <div class="frame" style="animation-delay:0.15s">
+          <div class="frame-box enc-frame">F3</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_3 [0.9, 0.3, ...]</div>
+        </div>
+        <div class="frame" style="animation-delay:0.2s">
+          <div class="frame-box enc-frame">F4</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_4 [0.4, 0.6, ...]</div>
+        </div>
+        <div class="frame" style="animation-delay:0.25s">
+          <div class="frame-box enc-frame">F5</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_5 [0.8, 0.2, ...]</div>
+        </div>
+        <div class="frame" style="animation-delay:0.3s">
+          <div class="frame-box enc-frame">F6</div>
+          <div class="frame-arrow">→</div>
+          <div class="output-box enc-output">embedding_6 [0.1, 0.9, ...]</div>
+        </div>
+      </div>
+
+      <div class="note-box enc-note">
+        <strong style="color:var(--enc-color);">Result:</strong> 6 frames → 6 separate embeddings.<br>
+        The language model now has to attend over <em>all 6</em> — more computation, longer sequence.
+      </div>
+    </div>
+
+    <!-- AGGREGATION ENCODER -->
+    <div class="demo-col">
+      <h4><span style="color:var(--agg-color);">●</span> Aggregation Encoder</h4>
+
+      <div style="margin-bottom:0.75rem;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;">GROUP 1 (frames 1-3) ─────</div>
+      <div class="group-bracket">
+        <div class="group-box">F1</div>
+        <div class="group-box">F2</div>
+        <div class="group-box">F3</div>
+      </div>
+      <div class="merge-arrow">↓ merge + encode</div>
+      <div class="patch-box">PATCH_1 — one embedding for all 3</div>
+
+      <div style="margin-bottom:0.75rem;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;">GROUP 2 (frames 4-6) ─────</div>
+      <div class="group-bracket">
+        <div class="group-box">F4</div>
+        <div class="group-box">F5</div>
+        <div class="group-box">F6</div>
+      </div>
+      <div class="merge-arrow">↓ merge + encode</div>
+      <div class="patch-box">PATCH_2 — one embedding for all 3</div>
+
+      <div class="note-box agg-note">
+        <strong style="color:var(--agg-color);">Result:</strong> 6 frames → <em>2</em> patch embeddings.<br>
+        The language model now only attends over <strong>2 things instead of 6</strong>. 3× less work!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ANALOGIES ── -->
+<div class="analogy-section">
+  <div style="text-align:center;margin-bottom:3rem;">
+    <span class="label" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:0.75rem;">REAL WORLD ANALOGIES</span>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);">Think of it like this</h2>
+  </div>
+
+  <div class="analogy-row">
+    <div class="analogy-emoji">📸</div>
+    <div class="analogy-content">
+      <h4>Photos on your phone</h4>
+      <p>
+        <strong class="enc-label">Regular Encoder:</strong> Your phone backs up every single photo individually — one by one, each gets its own slot, its own label, its own upload. 1000 photos = 1000 separate operations.<br><br>
+        <strong class="agg-label">Aggregation Encoder:</strong> Your phone groups photos from the same day into one album — "Saturday at the beach" — and stores the <em>summary</em> of that day. 1000 photos = maybe 20 albums. Way faster to browse!
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy-row">
+    <div class="analogy-emoji">📰</div>
+    <div class="analogy-content">
+      <h4>Reading the news</h4>
+      <p>
+        <strong class="enc-label">Regular Encoder:</strong> You read every single article, word by word, and write a one-line note for each one separately. If there are 100 articles, you write 100 notes.<br><br>
+        <strong class="agg-label">Aggregation Encoder:</strong> You read a batch of articles on the same topic — say, 5 articles about the economy — and write one combined summary: "Markets fell due to inflation worries." You've captured the essence of 5 articles in 1 note.
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy-row">
+    <div class="analogy-emoji">🎵</div>
+    <div class="analogy-content">
+      <h4>Music (closest to DiTAR!)</h4>
+      <p>
+        <strong class="enc-label">Regular Encoder:</strong> Imagine transcribing a song note-by-note. Every 1/100th of a second of sound gets its own separate description. A 3-minute song = millions of individual descriptions. The AI has to process ALL of them.
+        <br><br>
+        <strong class="agg-label">Aggregation Encoder:</strong> Instead, you group every 10 notes into one "phrase" and describe the phrase. "Rising melody, high pitch, excited tone." That's an audio patch — a meaningful chunk, not a single millisecond. DiTAR works in these chunks, so the brain model only handles dozens of patches, not millions of raw frames.
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy-row">
+    <div class="analogy-emoji">🧑‍🍳</div>
+    <div class="analogy-content">
+      <h4>A sandwich shop order</h4>
+      <p>
+        <strong class="enc-label">Regular Encoder:</strong> The cashier writes down every single ingredient separately on the ticket: "bread", "cheese", "tomato", "lettuce", "mayo", "ham", "bread". 7 items on the ticket for one sandwich.<br><br>
+        <strong class="agg-label">Aggregation Encoder:</strong> The cashier writes "1× Club Sandwich." One item on the ticket — but it carries all the same information, compactly. The kitchen knows exactly what to make.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── COMPARISON TABLE ── -->
+<div class="table-section">
+  <div style="text-align:center;">
+    <span class="label" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:0.75rem;">SIDE BY SIDE</span>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);">Complete comparison</h2>
+  </div>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>ENCODER</th>
+        <th>AGGREGATION ENCODER</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>INPUT</td>
+        <td>One item at a time (one frame, one word, one pixel)</td>
+        <td>A group/patch of multiple items at once</td>
+      </tr>
+      <tr>
+        <td>OUTPUT</td>
+        <td>One embedding per input item</td>
+        <td>One embedding per group (patch)</td>
+      </tr>
+      <tr>
+        <td>SEQUENCE LENGTH</td>
+        <td>Long — same length as original input</td>
+        <td>Short — compressed by patch size (e.g., 10×)</td>
+      </tr>
+      <tr>
+        <td>COMPUTATION</td>
+        <td>Higher — model must process every single token</td>
+        <td>Lower — model processes far fewer patches</td>
+      </tr>
+      <tr>
+        <td>DETAIL</td>
+        <td>Very fine-grained detail preserved per token</td>
+        <td>Some local detail averaged out, but structure preserved</td>
+      </tr>
+      <tr>
+        <td>USE IN</td>
+        <td>BERT, ViT (images), speech classifiers</td>
+        <td>DiTAR (speech), MAR (images), PatchTST (time series)</td>
+      </tr>
+      <tr>
+        <td>ANALOGY</td>
+        <td>Reading every word in a book</td>
+        <td>Reading the chapter summaries of a book</td>
+      </tr>
+      <tr>
+        <td>SPEED</td>
+        <td>Slower at inference (long context)</td>
+        <td>Much faster — shorter sequence = less attention cost</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── WHEN TO USE ── -->
+<div class="when-section">
+  <div style="text-align:center;margin-bottom:2rem;">
+    <span class="label" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:0.75rem;">PRACTICAL GUIDE</span>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);">When is each one used?</h2>
+  </div>
+
+  <div class="when-grid">
+    <div class="when-card enc-card">
+      <h4>Regular Encoder — use when...</h4>
+      <div class="when-item">Every detail matters individually (e.g., classifying a specific word in a sentence)</div>
+      <div class="when-item">You need exact token-level alignment (e.g., Named Entity Recognition, subtitles)</div>
+      <div class="when-item">Your input is already short (a sentence, a small image)</div>
+      <div class="when-item">You're doing tasks like sentiment analysis, translation, question answering</div>
+      <div class="when-item">Examples: BERT for text, ViT patch encoder for images, Wav2Vec for speech features</div>
+    </div>
+    <div class="when-card agg-card">
+      <h4>Aggregation Encoder — use when...</h4>
+      <div class="when-item">Your raw input is very long (audio = thousands of frames, video, long docs)</div>
+      <div class="when-item">Speed matters and you can afford to summarize local regions</div>
+      <div class="when-item">You're pairing it with an expensive model (like a big LM) that can't handle long sequences</div>
+      <div class="when-item">You want to generate sequences autoregressively (one patch at a time)</div>
+      <div class="when-item">Examples: DiTAR for speech, Temporal Patch Embeddings for video, PatchTST for time series</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── KEY INSIGHT ── -->
+<div class="container">
+  <div class="insight">
+    <span class="insight-label">⚡ THE CORE INSIGHT</span>
+    <p>
+      Both encoders do the same fundamental job: <strong>turn raw data into numbers a model can understand.</strong> The difference is granularity. A regular encoder says <em>"I'll describe every grain of sand."</em> An aggregation encoder says <em>"I'll describe every handful."</em> DiTAR uses the aggregation approach because audio is like a beach — millions of grains — and no language model can afford to read them one by one.
+    </p>
+  </div>
+</div>
+
+<footer>ENCODER vs AGGREGATION ENCODER · EXPLAINED · CLAUDE × DITAR</footer>
+
+</body>
+</html>
